@@ -29,7 +29,7 @@ The instalation can be performed in two ways: using git or downloading manually.
 2. Add `gitBG.sh` to the end of `.bashrc` file.
 
     ```sh
-    echo "source .gitBG/gitBG.sh" >> ~/.bashrc
+    echo "source ~/GitBG/gitBG.sh" >> ~/.bashrc
     ```
 
 #### Without git
