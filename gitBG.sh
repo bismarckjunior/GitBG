@@ -88,12 +88,11 @@ __get_commit_status(){
 
     if [[ $co_status == [ahead* ]]; then
         echo -n "${GITBG_COLOR_GREEN}[$n_co"
-    fi
-
-    if [[ $co_status == [behind* ]]; then
-        echo -n "${GITBG_COLOR_GREEN}[$n_co]"
-    elif [[ $co_status == *behind* ]]; then
-        echo -n " ${GITBG_COLOR_RED}`echo $co_status | cut -d ' ' -f4`"
+        if [[ $co_status == *behind* ]]; then
+            echo -n " ${GITBG_COLOR_RED}`echo $co_status | cut -d ' ' -f4`"
+        fi
+    elif [[ $co_status == [behind* ]]; then
+        echo -n "${GITBG_COLOR_RED}[$n_co"
     fi
 }
 
