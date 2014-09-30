@@ -65,11 +65,6 @@ SSH logon time (in seconds):
 
     git config gitBG.logonTime 36000
 
-Prompt in one line:
-
-    git config gitBG.promptOneLine false
-    git config gitBG.promptOneLine true
-
 Print "git status -s" after prompt:
 
     git config gitBG.status true
