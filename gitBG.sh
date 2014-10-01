@@ -16,7 +16,7 @@ GITBG_AUTHOR="Bismarck Gomes Souza Junior"
 GITBG_EMAIL="bismarckgomes@gmail.com"
 
 # Version
-GITBG_VERSION="0.0.1"
+GITBG_VERSION="0.1.0"
 GITBG_SITE="http://goo.gl/kVCx8n"
 
 ########################### REGULAR COLORS ####################################
@@ -69,7 +69,7 @@ __print_git_status(){
     fi
 }
 
-# Gets first part of prompt
+# Gets first part of prompt and set title
 __get_working_dir(){
     local rep=$(git rev-parse --show-toplevel)
     local repo=${rep##*/}
@@ -217,11 +217,15 @@ __kill_ssh_agent_process(){
     done
 }
 
-# Prints title and connection status
+# Prints title
+__print_title(){
+    echo -en "\e]2;GitBG $GITBG_VERSION$1\a"
+}
+
+# Prints header and connection status
 __print_header(){
     clear
-    echo -e "\e]2;GitBG $GITBG_VERSION\a"
-    local header="${GITBG_COLOR_YELLOW2}GitBG $GITBG_VERSION ($GITBG_SITE)"
+    local header=" ${GITBG_COLOR_YELLOW2}GitBG $GITBG_VERSION ($GITBG_SITE)"
 
     # Define columns defalut: 80
     if [ -z $COLUMNS ]; then
@@ -229,7 +233,10 @@ __print_header(){
     fi
 
     # Prints header
-    printf "%b%$(($COLUMNS-$(expr ${#header} % $COLUMNS)+16))b\n\n" "$header" "$1"
+    printf "\n%b%$(($COLUMNS-$(expr ${#header} % $COLUMNS)+16))b\n\n" "$header" "$1"
+
+    # Prints title
+    __print_title
 }
 
 # Define defalut variables
@@ -291,6 +298,9 @@ __gitBG_prompt(){
 
         # Current branch
         local cb=$(__get_current_branch)
+
+        # Prints title
+        __print_title " - $dir"
 
         # PS1 for git folder
         echo -ne "\n${GITBG_COLOR_GREEN}$dir $git_color($cb)$co_status"
