@@ -16,7 +16,7 @@ GITBG_AUTHOR="Bismarck Gomes Souza Junior"
 GITBG_EMAIL="bismarckgomes@gmail.com"
 
 # Version
-GITBG_VERSION="0.0.1"
+GITBG_VERSION="0.1.0"
 GITBG_SITE="http://goo.gl/kVCx8n"
 
 ########################### REGULAR COLORS ####################################
@@ -49,7 +49,8 @@ __is_git_repo(){
 __print_git_status(){
     local status=$(GIT_PAGER_IN_USE=true git status -s)
 
-    if [[ $status != "" ]]; then
+    if [[ $status != "" ]] &&
+       [[ $(git config gitBG.maxLineStatus) -gt 1 ]]; then
 
         lines=$(echo -e "$status" | wc -l)
         maxLine=$(git config gitBG.maxLineStatus)
@@ -68,7 +69,7 @@ __print_git_status(){
     fi
 }
 
-# Gets first part of prompt
+# Gets first part of prompt and set title
 __get_working_dir(){
     local rep=$(git rev-parse --show-toplevel)
     local repo=${rep##*/}
@@ -87,26 +88,23 @@ __get_commit_status(){
 
     if [[ $co_status == [ahead* ]]; then
         echo -n "${GITBG_COLOR_GREEN}[$n_co"
-    fi
-
-    if [[ $co_status == [behind* ]]; then
-        echo -n "${GITBG_COLOR_GREEN}[$n_co]"
-    elif [[ $co_status == *behind* ]]; then
-        echo -n " ${GITBG_COLOR_RED}`echo $co_status | cut -d ' ' -f4`"
+        if [[ $co_status == *behind* ]]; then
+            echo -n " ${GITBG_COLOR_RED}`echo $co_status | cut -d ' ' -f4`"
+        fi
+    elif [[ $co_status == [behind* ]]; then
+        echo -n "${GITBG_COLOR_RED}[$n_co"
     fi
 }
 
 # Returns current branch
 __get_current_branch(){
+    local current_branch=$(git rev-parse --abbrev-ref --symbolic HEAD)
     local git_dir=$(git rev-parse --git-dir)
-    local current_branch=""
     local status=""
     local next=""
     local last=""
 
-    if [ "$(cat "$git_dir/HEAD" | grep " ")" ]; then
-        current_branch=$(cat "$git_dir/HEAD" | sed -E "s/.*\/(.*)/\1/")
-    else
+    if [[ current_branch -eq HEAD ]]; then
         current_branch=$(git name-rev --name-only HEAD)
     fi
 
@@ -196,8 +194,6 @@ __add_ssh_key(){
         connection="${GITBG_COLOR_RED}[DISCONNECTED]"
     fi
 
-
-
     # Prints header
     __print_header $connection
 }
@@ -220,11 +216,16 @@ __kill_ssh_agent_process(){
         fi
     done
 }
-# Prints title and connection status
+
+# Prints title
+__print_title(){
+    echo -en "\e]2;GitBG $GITBG_VERSION$1\a"
+}
+
+# Prints header and connection status
 __print_header(){
     clear
-    echo -e "\e]2;GitBG $GITBG_VERSION\a"
-    local header="${GITBG_COLOR_YELLOW2}GitBG $GITBG_VERSION ($GITBG_SITE)"
+    local header=" ${GITBG_COLOR_YELLOW2}GitBG $GITBG_VERSION ($GITBG_SITE)"
 
     # Define columns defalut: 80
     if [ -z $COLUMNS ]; then
@@ -232,8 +233,10 @@ __print_header(){
     fi
 
     # Prints header
+    printf "\n%b%$(($COLUMNS-$(expr ${#header} % $COLUMNS)+16))b\n\n" "$header" "$1"
 
-    printf "%b%$(($COLUMNS-$(expr ${#header} % $COLUMNS)+16))b\n\n" "$header" "$1"
+    # Prints title
+    __print_title
 }
 
 # Define defalut variables
@@ -250,9 +253,6 @@ __define_default_variables(){
     # SSH logon time (in seconds)
     git config --global gitBG.logonTime 36000
 
-    # Prompt in one line
-    git config --global gitBG.promptOneLine false
-
     # Print "git status" after prompt
     git config --global gitBG.status true
 
@@ -260,7 +260,7 @@ __define_default_variables(){
     git config --global gitBG.maxLineStatus 15
 
     # Path for GitBG files
-    git config --global gitBG.path "~/.gitBG"
+    git config --global gitBG.path "~/GitBG"
 
     ### Prompt colors  ###
     # Color for modified file
@@ -283,8 +283,7 @@ __define_default_variables(){
 __gitBG_prompt(){
     if __is_git_repo; then
         # Print status before
-        if [[ $(git config gitBG.status) == true ]] &&
-           [[ $(git config gitBG.maxLineStatus) -gt 1 ]]; then
+        if [[ $(git config gitBG.status) == true ]]; then
             __print_git_status
         fi
 
@@ -300,13 +299,12 @@ __gitBG_prompt(){
         # Current branch
         local cb=$(__get_current_branch)
 
+        # Prints title
+        __print_title " - $dir"
+
         # PS1 for git folder
         echo -ne "\n${GITBG_COLOR_GREEN}$dir $git_color($cb)$co_status"
-
-        if [[ $(git config gitBG.promptOneLine) == false ]]; then
-            echo
-        fi
-        echo -n "${GITBG_COLOR_WHITE}\$ "
+        echo "\n${GITBG_COLOR_WHITE}\$ "
     else
         # PS1 for not git folder
         #PS1_OLD="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h:\w\$"

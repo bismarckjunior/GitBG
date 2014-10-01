@@ -1,5 +1,5 @@
-GitBG
-=====
+GitBG 0.1.0
+===========
 It's a prompt for git repositories that works in Windows by MINGW.
 
 ![screenshot]
@@ -15,6 +15,13 @@ Features
     - Green: modified files
     - Yellow: added file
 
+What's new?
+-----------
+#### 0.1.0
+* Fixed number of commits behind: format and color
+* Optimized some functions
+* Name of repository in console title
+* Removed the option "promptOneLine"
 
 Instalation
 -----------
@@ -26,6 +33,7 @@ The instalation can be performed in two ways: using git or downloading manually.
     ```sh
     git clone git@github.com:bismarckjunior/gitBG.git ~/GitBG
     ```
+
 2. Add `gitBG.sh` to the end of `.bashrc` file.
 
     ```sh
@@ -38,11 +46,28 @@ The instalation can be performed in two ways: using git or downloading manually.
     ```sh
     mkdir ~/GitBG
     ```
+
 2. Download and extract the files to `~/GitBG`.
+
 3. Add `gitBG.sh` to the end of `.bashrc` file.
 
     ```sh
     echo "source ~/GitBG/gitBG.sh" >> ~/.bashrc
+    ```
+
+
+Update
+------
+1. Go to GitBG folder.
+
+    ```sh
+    cd ~/GitBG
+    ```
+
+2. Update GitBG repository.
+
+    ```sh
+    git pull
     ```
 
 
@@ -64,11 +89,6 @@ Auto SSH logoff:
 SSH logon time (in seconds):
 
     git config gitBG.logonTime 36000
-
-Prompt in one line:
-
-    git config gitBG.promptOneLine false
-    git config gitBG.promptOneLine true
 
 Print "git status -s" after prompt:
 
