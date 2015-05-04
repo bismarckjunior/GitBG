@@ -1,4 +1,4 @@
-GitBG 1.0
+GitBG 1.1
 ===========
 It's a prompt for git repositories that works in Windows by MINGW.
 
@@ -19,8 +19,8 @@ What's new?
 -----------
 #### 1.1
 * Double enter: print files and connection status
-* New function: add_ssh_key 
-* Branch name bug fixed 
+* New function: add_ssh_key
+* Branch name bug fixed
 
 #### 1.0
 * Fixed number of commits behind: format and color
