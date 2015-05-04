@@ -16,7 +16,7 @@ GITBG_AUTHOR="Bismarck Gomes Souza Junior"
 GITBG_EMAIL="bismarckgomes@gmail.com"
 
 # Version
-GITBG_VERSION="0.1.0"
+GITBG_VERSION="1.1"
 GITBG_SITE="http://goo.gl/kVCx8n"
 
 ########################### REGULAR COLORS ####################################
@@ -36,6 +36,15 @@ GITBG_COLOR_WHITE="\033[0;37m"          # White
 GITBG_COLOR_WHITE2="\033[1;37m"         # White (bold)
 ###############################################################################
 
+# Get varibles for file status
+GITBG_MOD_FILE_COLOR=$(git config gitBG.color.modifiedFile)
+GITBG_DEL_FILE_COLOR=$(git config gitBG.color.deletedFile)
+GITBG_NEW_FILE_COLOR=$(git config gitBG.color.newFile)
+GITBG_ADD_FILE_COLOR=$(git config gitBG.color.addedFile)
+GITBG_N_A_FILE_COLOR=$(git config gitBG.color.notAddedFile)
+
+###############################################################################
+
 # Checks if it is a git repository
 __is_git_repo(){
     if git ls-files >& /dev/null; then
@@ -50,18 +59,17 @@ __print_git_status(){
     local status=$(GIT_PAGER_IN_USE=true git status -s)
 
     if [[ $status != "" ]] &&
-       [[ $(git config gitBG.maxLineStatus) -gt 1 ]]; then
+       [[ $GITBG_MAXLINE_STATUS -gt 1 ]]; then
 
         lines=$(echo -e "$status" | wc -l)
-        maxLine=$(git config gitBG.maxLineStatus)
 
         echo "$GITBG_COLOR_WHITE\n"
         echo "---------------------------------------------------"
 
-        if [[ $lines -le $maxLine ]]; then
+        if [[ $lines -le $GITBG_MAXLINE_STATUS ]]; then
             echo -e "$status"
         else
-            echo -e "$status" | head -$(($maxLine-1))
+            echo -e "$status" | head -$(($GITBG_MAXLINE_STATUS-1))
             echo "..\n.."
             echo -e "$status" | tail -1
         fi
@@ -98,14 +106,18 @@ __get_commit_status(){
 
 # Returns current branch
 __get_current_branch(){
-    local current_branch=$(git rev-parse --abbrev-ref --symbolic HEAD)
+    local current_branch=$(git rev-parse --abbrev-ref --symbolic HEAD 2> /dev/null)
     local git_dir=$(git rev-parse --git-dir)
     local status=""
     local next=""
     local last=""
 
-    if [[ current_branch -eq HEAD ]]; then
-        current_branch=$(git name-rev --name-only HEAD)
+    if [[ $current_branch == "HEAD" ]]; then
+        current_branch=$(git symbolic-ref --short HEAD 2> /dev/null)
+    fi
+
+    if [[ $current_branch == "" ]]; then
+        current_branch=$(echo "!$(git name-rev --name-only HEAD)")
     fi
 
     if [ -d "$git_dir/rebase-merge" ]; then
@@ -168,7 +180,7 @@ __start_ssh_agent(){
 }
 
 # Adds a ssh-key for a period
-__add_ssh_key(){
+add_ssh_key(){
     # Starts ssh-agent
     __start_ssh_agent
 
@@ -184,6 +196,11 @@ __add_ssh_key(){
             ssh-add >& /dev/null
         fi
     fi
+
+    __print_header_connection
+}
+
+__print_header_connection(){
 
     local connection=""
 
@@ -224,7 +241,8 @@ __print_title(){
 
 # Prints header and connection status
 __print_header(){
-    clear
+    # clear
+    printf "\ec"
     local header=" ${GITBG_COLOR_YELLOW2}GitBG $GITBG_VERSION ($GITBG_SITE)"
 
     # Define columns defalut: 80
@@ -253,7 +271,7 @@ __define_default_variables(){
     # SSH logon time (in seconds)
     git config --global gitBG.logonTime 36000
 
-    # Print "git status" after prompt
+    # Print "git status" with double enter
     git config --global gitBG.status true
 
     # Number of lines for "git status" after prompt
@@ -282,13 +300,19 @@ __define_default_variables(){
 # Gets PS1
 __gitBG_prompt(){
     if __is_git_repo; then
-        # Print status before
-        if [[ $(git config gitBG.status) == true ]]; then
-            __print_git_status
+
+        if [[ $(($(date +%s)-$T_OLD)) -le 2 ]]; then
+            # Prints header
+            __print_header_connection
+
+            if [[ $GITBG_PRINT_STATUS == true ]]; then
+                # Print status before
+                __print_git_status
+            fi
         fi
 
         # Branch color
-        local git_color=$(__get_git_color)
+        local git_color=$($a)
 
         # Gets working directory
         local dir=$(__get_working_dir)
@@ -303,12 +327,13 @@ __gitBG_prompt(){
         __print_title " - $dir"
 
         # PS1 for git folder
-        echo -ne "\n${GITBG_COLOR_GREEN}$dir $git_color($cb)$co_status"
-        echo "\n${GITBG_COLOR_WHITE}\$ "
+        echo -e "\n${GITBG_COLOR_GREEN}$dir $git_color($cb)${co_status}"
+        echo -e "${GITBG_COLOR_WHITE}\$ "
+
     else
         # PS1 for not git folder
         #PS1_OLD="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h:\w\$"
-        echo -ne "${GITBG_COLOR_WHITE}$PS1_OLD"
+        echo -e "${GITBG_COLOR_WHITE}$PS1_OLD"
     fi
 }
 
@@ -328,14 +353,21 @@ if __is_git_repo; then
 
     # Adds ssh-key and prints the status of connection
     if [[ $(git config gitBG.logon) == true ]]; then
-        __add_ssh_key
+        add_ssh_key
     fi
 fi
+
+# Old time
+T_OLD=$(($(date +%s)-2))
 
 # Save old PS1
 PS1_OLD=$PS1
 
+# Get status variables
+GITBG_PRINT_STATUS=$(git config gitBG.status)
+GITBG_MAXLINE_STATUS=$(git config gitBG.maxLineStatus)
+
 # New PS1
-PROMPT_COMMAND='PS1="$(__gitBG_prompt)"'
+PROMPT_COMMAND='PS1="$(__gitBG_prompt)"; T_OLD=$(($(date +%s)-2));'
 
 ################################################################################

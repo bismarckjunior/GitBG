@@ -1,4 +1,4 @@
-GitBG 0.1.0
+GitBG 1.0
 ===========
 It's a prompt for git repositories that works in Windows by MINGW.
 
@@ -8,7 +8,7 @@ Features
 --------
 * Number of commits ahead (green) or behind (red) from remote branch
 * Avoid insert password every update for ssh protocol
-* Show short status of files before each prompt line
+* Show short status of files with double enter
 * Colored current branch
     - Cyan: new files
     - Red: deleted files
@@ -17,7 +17,12 @@ Features
 
 What's new?
 -----------
-#### 0.1.0
+#### 1.1
+* Double enter: print files and connection status
+* New function: add_ssh_key 
+* Branch name bug fixed 
+
+#### 1.0
 * Fixed number of commits behind: format and color
 * Optimized some functions
 * Name of repository in console title
@@ -90,7 +95,7 @@ SSH logon time (in seconds):
 
     git config gitBG.logonTime 36000
 
-Print "git status -s" after prompt:
+Print "git status -s" with double enter:
 
     git config gitBG.status true
     git config gitBG.status false
@@ -123,27 +128,43 @@ The possibles colors are:
 | White          | $GITBG_COLOR_WHITE    |
 | White (bold)   | $GITBG_COLOR_WHITE2   |
 
-
-Color for modified file:
+Color branch for modified file:
 
     git config gitBG.color.modifiedFile $GITBG_COLOR_GREEN2
 
-Color for deleted file:
+Color branch for deleted file:
 
     git config gitBG.color.deletedFile $GITBG_COLOR_RED
 
- Color for new file:
+ Color branch for new file:
 
     git config gitBG.color.newFile $GITBG_COLOR_CYAN
 
- Color for not added file:
+ Color branch for not added file:
 
     git config gitBG.color.notAddedFile $GITBG_COLOR_BLUE
 
- Color for added file:
+ Color branch for added file:
 
     git config gitBG.color.addedFile $GITBG_COLOR_YELLOW
 
+## Defaut variables
+The default variables are:
+
+| Variable          | Value                   |
+| -------------     | -------------           |
+| reset             | true                    |
+| logon             | true                    |
+| logoff            | false                   |
+| logoTime          | 36000                   |
+| status            | true                    |
+| maxLineStatus     | 15                      |
+| path              | "~/GitBG"               |
+| modifiedFile      | $GITBG_COLOR_GREEN2     |
+| deletedFile       | $GITBG_COLOR_RED        |
+| newFile           | $GITBG_COLOR_CYAN       |
+| notAddedFile      | $GITBG_COLOR_BLUE       |
+| addedFile         | $GITBG_COLOR_YEALLOW    |
 
 Author
 ------
