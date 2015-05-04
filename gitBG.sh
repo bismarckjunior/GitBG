@@ -36,15 +36,6 @@ GITBG_COLOR_WHITE="\033[0;37m"          # White
 GITBG_COLOR_WHITE2="\033[1;37m"         # White (bold)
 ###############################################################################
 
-# Get varibles for file status
-GITBG_MOD_FILE_COLOR=$(git config gitBG.color.modifiedFile)
-GITBG_DEL_FILE_COLOR=$(git config gitBG.color.deletedFile)
-GITBG_NEW_FILE_COLOR=$(git config gitBG.color.newFile)
-GITBG_ADD_FILE_COLOR=$(git config gitBG.color.addedFile)
-GITBG_N_A_FILE_COLOR=$(git config gitBG.color.notAddedFile)
-
-###############################################################################
-
 # Checks if it is a git repository
 __is_git_repo(){
     if git ls-files >& /dev/null; then
@@ -156,15 +147,15 @@ __get_current_branch(){
 __get_git_color(){
     case $(git status -s) in
         \ M*)
-            git config gitBG.color.modifiedFile;;     # Modified files
+            echo $GITBG_MOD_FILE_COLOR;;     # Modified files
         \ D*)
-            git config gitBG.color.deletedFile;;      # Deleted files
+            echo $GITBG_DEL_FILE_COLOR;;     # Deleted files
         "??"*)
-            git config gitBG.color.newFile;;          # New files
+            echo $GITBG_NEW_FILE_COLOR;;     # New files
         \ *)
-            git config gitBG.color.notAddedFile;;     # Not added to index
+            echo $GITBG_N_A_FILE_COLOR;;     # Not added to index
         A* | R* | M* | D*)
-            git config gitBG.color.addedFile;;        # Added to index
+            echo $GITBG_ADD_FILE_COLOR;;     # Added to index
     esac
 }
 
@@ -312,7 +303,7 @@ __gitBG_prompt(){
         fi
 
         # Branch color
-        local git_color=$($a)
+        local git_color=$(__get_git_color)
 
         # Gets working directory
         local dir=$(__get_working_dir)
@@ -343,6 +334,13 @@ __gitBG_prompt(){
 if [[ $(git config gitBG.reset) != false ]]; then
     __define_default_variables
 fi
+
+# Get varibles for file status
+GITBG_MOD_FILE_COLOR=$(git config gitBG.color.modifiedFile)
+GITBG_DEL_FILE_COLOR=$(git config gitBG.color.deletedFile)
+GITBG_NEW_FILE_COLOR=$(git config gitBG.color.newFile)
+GITBG_ADD_FILE_COLOR=$(git config gitBG.color.addedFile)
+GITBG_N_A_FILE_COLOR=$(git config gitBG.color.notAddedFile)
 
 if __is_git_repo; then
     # Prints header
