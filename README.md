@@ -82,16 +82,16 @@ Resets default variables:
 
     git config gitBG.reset true
 
-Auto SSH logon when start in git repository:
+Auto [SSH][1] logon when start in git repository:
 
     git config gitBG.logon true
 
-Auto SSH logoff:
+Auto [SSH][1] logoff:
 
     git config gitBG.logoff true
     git config gitBG.logoff false
 
-SSH logon time (in seconds):
+[SSH][1] logon time (in seconds):
 
     git config gitBG.logonTime 36000
 
@@ -166,6 +166,17 @@ The default variables are:
 | notAddedFile      | $GITBG_COLOR_BLUE       |
 | addedFile         | $GITBG_COLOR_YEALLOW    |
 
+
+## Alias
+Some useful alias are:
+
+    git config --global alias.lol "log --oneline --decorate --graph"
+
+    git config --global alias.lola "log --oneline --decorate --graph --all"
+
+    git config --global alias.s "status -s"
+
+
 Author
 ------
 Bismarck Gomes Souza Jr <<bismarckgomes@gmail.com>>.
@@ -175,7 +186,7 @@ License
 -------
 GitBG is available under the GLPv3 [license]. See the LICENSE file for more details.
 
-
+[1]:https://help.github.com/articles/generating-ssh-keys/
 [license]:http://www.gnu.org/licenses/gpl-3.0.txt
 [screenshot]:https://github.com/bismarckjunior/GitBG/blob/master/images/screenshot.png
 
